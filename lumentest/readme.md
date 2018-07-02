@@ -66,7 +66,7 @@ CREATE TABLE "public"."users" (
 ) WITH (oids = false);
 ```
 
-Этот же скрипт описан в файле `/dump.sql`
+Этот же скрипт описан в файле [/dump.sql](/lumentest/dump.sql)
 
 Импорт логов в БД расположен по URL [/db_import](http://lumentest/db_import)
 
