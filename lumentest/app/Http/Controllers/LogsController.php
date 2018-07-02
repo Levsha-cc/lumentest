@@ -6,26 +6,20 @@ use App\Logs;
 
 class LogsController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct() {}
-
     public function generateLogs()
     {
-        $oLogs = new Logs();
-        $info = $oLogs->generateLogs(200)->info();
-
-        return view('logsInfo', ['info' => $info]);
+        $c = (int)$_GET['c'];
+        if (!$c || $c < 0 || $c > 1000) {
+            $c = 100;
+        }
+        $info = (new Logs)->generateLogs($c)->info();
+        return view('logsInfo', compact('info'));
     }
 
     public function showLogs()
     {
-        $oLogs = new Logs();
-        $info = $oLogs->info();
-        return view('logsInfo', ['info' => $info]);
+        $info = (new Logs)->info();
+        return view('logsInfo', compact('info'));
     }
 
 }
