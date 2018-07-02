@@ -7,53 +7,36 @@ use DB;
 
 class PDBController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct() {}
-
     public function showDB()
     {
-        $oPDB = new PDB();
-        $info = $oPDB->dbInfo();
-
-        return view('dbInfo', ['info' => $info]);
+        $info = (new PDB)->dbInfo();
+        return view('dbInfo', compact('info'));
     }
 
     public function importLogs()
     {
-        $oPDB = new PDB();
-        $info = $oPDB->importLogs()->dbInfo();
-
-        return view('dbInfo', ['info' => $info]);
+        $info = (new PDB)->importLogs()->dbInfo();
+        return view('dbInfo', compact('info'));
     }
 
     public function showTable()
     {
-        $oPDB = new PDB();
-        $data = $oPDB->tableData();
-
+        $data = (new PDB)->tableData();
         return view('table', compact('data'));
     }
 
     public function showTableJS()
     {
-        $oPDB = new PDB();
-        $data = $oPDB->tableData();
-
+        $data = (new PDB)->tableData();
         return view('tablejs', compact('data'));
     }
 
     public function showTableJSON()
     {
-        $oPDB = new PDB();
-
         $limit = 25;//(int)$_GET['limit'];
         $offset = (int)$_GET['start'];
 
-        $data = $oPDB->tableData($limit, $offset);
+        $data = (new PDB)->tableData($limit, $offset);
 
         $result = [
             'success' => true,
@@ -62,6 +45,4 @@ class PDBController extends Controller
         ];
         return $result;
     }
-
-
 }

@@ -15,21 +15,27 @@ class PDB extends Model
 {
     private $tables = ['users', 'story'];
 
+    /**
+     * Импортирует логи в БД
+     * @return $this
+     */
     public function importLogs()
     {
-        $oLogs = new Logs();
-        $logs = $oLogs->info();
+        // данные о текущих логах
+        $logs = (new Logs)->info();
 
+        // очищаем обе таблицы
         foreach ($this->tables as $name) {
             DB::statement("TRUNCATE {$name} CASCADE");
         }
 
+        // считываем файлы как CSV и построчно пишеи в БД
         foreach ($this->tables as $name) {
-
             $file = fopen($logs[$name]['path'], "r");
             while ( ($data = fgetcsv($file, 2000, "|")) !==FALSE) {
 
                 $insert = [];
+                // ассоциации для пользователей
                 if ($name == 'users') {
                     $insert = [
                         'ip' => trim($data[0]),
@@ -38,6 +44,7 @@ class PDB extends Model
                     ];
                 }
 
+                // ассоциации для истории
                 if ($name == 'story') {
                     $insert = [
                         'date' => trim($data[0] . ' ' . $data[1]),
@@ -55,6 +62,10 @@ class PDB extends Model
         return $this;
     }
 
+    /**
+     * Возвращает массив таблиц, где ключом является имя таблицы, а значением колво записей в таблице
+     * @return array
+     */
     public function dbInfo()
     {
         $data = [];
@@ -64,14 +75,20 @@ class PDB extends Model
         return $data;
     }
 
+    /**
+     * Выбираем нужные данные для таблицы одним запросом
+     * @param int $limit
+     * @param int $offset
+     * @return mixed
+     */
     public function tableData($limit = 0, $offset = 0)
     {
         $query_limit = '';
         if (($limit = (int)$limit) && $limit > 0) {
-            $query_limit = "LIMIT {$limit} ";
+            $query_limit = " LIMIT {$limit} ";
         }
         if ($query_limit && ($offset = (int)$offset) && $offset > 0) {
-            $query_limit .= "OFFSET {$offset} ";
+            $query_limit .= " OFFSET {$offset} ";
         }
 
         $result = DB::select("

@@ -40,8 +40,10 @@ class Logs extends Model
 
     public function __construct()
     {
+        // Для генератора - задаем текущее время
         $this->time = time();
 
+        // создаем пустые логи, если их нет
         $logs = ['users', 'story'];
         foreach ($logs as $name) {
             if (!file_exists($this->path($name))) file_put_contents($this->path($name) , '');
