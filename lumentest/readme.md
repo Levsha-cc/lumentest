@@ -24,8 +24,8 @@ DB_PASSWORD=
 ## Логи
 
 2 файла логов находятся в папке `/public`:
-* [users.log](/public/users.log)
-* [story.log](/public/story.log)
+* [users.log](/lumentest/public/users.log)
+* [story.log](/lumentest/public/story.log)
 
 Так как логов предоставлено не было, я сделал генератор логов, который доступен по 
 URL [/logs_create](http://lumentest/logs_create) и позволяет сгенерировать логи на 25, 50, 100, 200 
