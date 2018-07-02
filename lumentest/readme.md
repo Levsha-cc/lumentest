@@ -23,13 +23,83 @@ DB_PASSWORD=
 
 ## Логи
 
+2 файла логов находятся в папке `/public`:
+* [users.log](/public/users.log)
+* [story.log](/public/story.log)
+
+Так как логов предоставлено не было, я сделал генератор логов, который доступен по 
+URL [/logs_create](http://lumentest/logs_create) и позволяет сгенерировать логи на 25, 50, 100, 200 
+или 500 пользователей. 
+
+Я разрабатывал на windows, под linux могут быть проблемы с записью, необходимо добавить 
+права на запись в папку `/public`. Знаю что нехорошо, сделал в угоду наглядности, чтобы 
+логи лекго открывались через браузер. 
 
 
+## База данных
 
-## Security Vulnerabilities
+Скрипт для создания таблиц:
 
-If you discover a security vulnerability within Lumen, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+```sql
 
-## License
+\connect "lumenlogs";
 
-The Lumen framework is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
+DROP TABLE IF EXISTS "story";
+CREATE TABLE "public"."story" (
+    "date" timestamp NOT NULL,
+    "ip" cidr NOT NULL,
+    "url_from" text NOT NULL,
+    "url_to" text NOT NULL,
+    CONSTRAINT "story_ip_fkey" FOREIGN KEY (ip) REFERENCES users(ip) NOT DEFERRABLE
+) WITH (oids = false);
+
+
+CREATE INDEX "story_ip" ON "public"."story" USING btree ("ip");
+
+
+DROP TABLE IF EXISTS "users";
+CREATE TABLE "public"."users" (
+    "ip" cidr NOT NULL,
+    "browser" character(255) NOT NULL,
+    "os" character(25) NOT NULL,
+    CONSTRAINT "users_ip" UNIQUE ("ip")
+) WITH (oids = false);
+```
+
+Этот же скрипт описан в файле `/dump.sql`
+
+Импорт логов в БД расположен по URL [/db_import](http://lumentest/db_import)
+
+Ключевой запрос для таблицы выглядит так:
+
+```sql
+SELECT distinct on (users.ip) 
+  users.ip, users.browser, users.os, story.url_from, lastStory.url_to, 
+  COUNT(*) over(partition by story.ip order by story.date)
+FROM users 
+LEFT JOIN story ON users.ip = story.ip
+LEFT JOIN story as lastStory ON users.ip = lastStory.ip
+order by users.ip, story.date ASC, lastStory DESC
+```
+
+## ExtJS
+
+Таблица ExtJS расположена по URL [/tablejs](http://lumentest/tablejs)
+
+Просто HTML таблица для "сверки" доступна по URL [/table](http://lumentest/table)
+
+## Интерфейс
+
+Все разделы доступны в верхнем правом меню: Логи, БД, Таблица, ExtJS. 
+Дополнительные функции расположены на кнопках в этих разделах.
+
+Такие функции как **генерация новых логов** или **импорт логов в БД** сделаны отдельными 
+независимыми методами. Это позволяет повесить их на комманду в CLI,
+например 
+
+```
+php artisan logs::generate
+``` 
+
+Сами команды реализовывать не стал, так как задания не было, но архитектуру 
+предусмотрел на будущее. 
