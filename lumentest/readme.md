@@ -1,6 +1,6 @@
 # Тестовое задание
 
-## Фреймвок
+## Технологии
 
 В качестве PHP-движка выбрал микрофреймворк [Lumen](http://lumen.laravel.com/) от Laravel.
 
@@ -20,6 +20,13 @@ DB_DATABASE=lumenlogs
 DB_USERNAME=postgres
 DB_PASSWORD=
 ```
+
+Так же использовал:
+* PHP 7.1
+* PostgreSQL 10.1
+* Bootstrap 4
+* ExtJS 6
+ 
 
 ## Логи
 
